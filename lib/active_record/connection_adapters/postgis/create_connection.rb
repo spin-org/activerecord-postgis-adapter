@@ -43,9 +43,14 @@ module ActiveRecord  # :nodoc:
           conn = PG.connect(conn_params)
           ConnectionAdapters::PostGISAdapter.new(conn, logger, conn_params, config)
         end
-
+      rescue ::PG::Error => error
+        if error.message.include?(conn_params[:dbname])
+          raise ActiveRecord::NoDatabaseError
+        else
+          raise
+        end
       end
-
     end
+
   end
 end
